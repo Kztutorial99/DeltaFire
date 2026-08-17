@@ -26,9 +26,9 @@ namespace DeltaFire.Editor
             CreateWorld();
             GameObject player = CreatePlayer();
             GameObject botPrefab = CreateBotPrefab();
-            CreateMatchManager(botPrefab);
+            Transform[] spawnPoints = CreateSpawnPoints();
+            CreateMatchManager(botPrefab, spawnPoints);
             CreateSafeZone();
-            CreateSpawnPoints();
 
             Selection.activeGameObject = player;
             EditorSceneManager.SaveScene(scene, ScenePath);
@@ -69,9 +69,10 @@ namespace DeltaFire.Editor
             player.AddComponent<FpsController>();
 
             GameObject cameraObject = new GameObject("PlayerCamera");
+            cameraObject.tag = "MainCamera";
             cameraObject.transform.SetParent(player.transform);
             cameraObject.transform.localPosition = new Vector3(0f, .65f, 0f);
-            Camera camera = cameraObject.AddComponent<Camera>();
+            cameraObject.AddComponent<Camera>();
             cameraObject.AddComponent<AudioListener>();
 
             GameObject weapon = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -97,12 +98,16 @@ namespace DeltaFire.Editor
             return prefab;
         }
 
-        private static void CreateMatchManager(GameObject botPrefab)
+        private static void CreateMatchManager(GameObject botPrefab, Transform[] spawnPoints)
         {
             GameObject manager = new GameObject("MatchManager");
             MatchManager match = manager.AddComponent<MatchManager>();
             SerializedObject serialized = new SerializedObject(match);
             serialized.FindProperty("botPrefab").objectReferenceValue = botPrefab;
+            serialized.FindProperty("targetBots").intValue = 12;
+            SerializedProperty array = serialized.FindProperty("spawnPoints");
+            array.arraySize = spawnPoints.Length;
+            for (int i = 0; i < spawnPoints.Length; i++) array.GetArrayElementAtIndex(i).objectReferenceValue = spawnPoints[i];
             serialized.ApplyModifiedPropertiesWithoutUndo();
         }
 
@@ -115,14 +120,17 @@ namespace DeltaFire.Editor
             zone.AddComponent<SafeZone>();
         }
 
-        private static void CreateSpawnPoints()
+        private static Transform[] CreateSpawnPoints()
         {
-            for (int i = 0; i < 8; i++)
+            Transform[] points = new Transform[8];
+            for (int i = 0; i < points.Length; i++)
             {
                 GameObject spawn = new GameObject("Spawn_" + i);
-                float angle = i * Mathf.PI * 2f / 8f;
+                float angle = i * Mathf.PI * 2f / points.Length;
                 spawn.transform.position = new Vector3(Mathf.Cos(angle) * 55f, 1f, Mathf.Sin(angle) * 55f);
+                points[i] = spawn.transform;
             }
+            return points;
         }
     }
 }
