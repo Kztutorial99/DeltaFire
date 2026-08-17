@@ -22,7 +22,7 @@ jobs:
           projectPath: .
           unityVersion: 6000.0.43f1
           targetPlatform: Android
-          buildMethod: UnityEditor.BuildPipeline.BuildPlayer
+          buildMethod: DeltaFire.Editor.DeltaFireBuild.BuildAndroid
           versioning: Semantic
           androidExportType: apk
           androidRelease: false
@@ -31,4 +31,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: DeltaFire-Android
-          path: build/**/*.apk
+          path: build/DeltaFire.apk
