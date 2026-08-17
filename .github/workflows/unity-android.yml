@@ -24,8 +24,12 @@ jobs:
           targetPlatform: Android
           buildMethod: DeltaFire.Editor.DeltaFireBuild.BuildAndroid
           versioning: Semantic
-          androidExportType: apk
-          androidRelease: false
+          androidExportType: androidPackage
+          androidTargetSdkVersion: 35
+
+      - name: Verify APK
+        shell: bash
+        run: test -f build/DeltaFire.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
